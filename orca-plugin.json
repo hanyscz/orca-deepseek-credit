@@ -6,7 +6,9 @@
   "name": "DeepSeek Credit",
   "version": "0.1.0",
   "description": "Shows your remaining DeepSeek credit in Orca's status bar. Czech and English. Only sends a balance request to api.deepseek.com.",
-  "author": { "name": "Lukas Hanak" },
+  "author": { "name": "Lukas Hanak", "url": "https://github.com/hanyscz" },
+  "homepage": "https://github.com/hanyscz/orca-deepseek-credit",
+  "repository": "https://github.com/hanyscz/orca-deepseek-credit",
   "license": "MIT",
   "icon": "assets/icon.png",
   "cover": {

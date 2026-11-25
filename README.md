@@ -58,10 +58,10 @@ orca plugin validate .
 ```
 
 Náhledový obrázek `assets/cover.png` se generuje z `assets/cover.html`. Stačí stránku vyrenderovat v headless Chrome
-s oknem 1600×900:
+s oknem 1600×1000:
 
 ```bash
-chrome --headless=new --hide-scrollbars --window-size=1600,900 --screenshot=assets/cover.png assets/cover.html
+chrome --headless=new --hide-scrollbars --window-size=1600,1000 --screenshot=assets/cover.png assets/cover.html
 ```
 
 ## Licence
