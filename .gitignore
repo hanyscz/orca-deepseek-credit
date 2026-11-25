@@ -1,0 +1,24 @@
+# Závislosti a výstupy sestavení (plugin se načítá přímo ze src/worker.ts)
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Lokální stav Orcy a agentů
+.orca/
+.orca-git-graph.gitgraph
+Git.control
+.claude/settings.local.json
+
+# Tajemství, nikdy necommitovat API klíče
+.env
+.env.*
+
+# Logy
+*.log
+
+# Systém a editory
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

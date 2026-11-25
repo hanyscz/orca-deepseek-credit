@@ -8,6 +8,8 @@
   "description": "Ukazuje zbývající kredit DeepSeek ve stavovém řádku Orcy. Posílá jen dotaz na zůstatek na api.deepseek.com.",
   "author": { "name": "Lukas Hanak" },
   "license": "MIT",
+  "icon": "assets/icon.png",
+  "cover": { "path": "assets/cover.png", "alt": "DeepSeek Credit pro Orca – zbývající kredit DeepSeek ve stavovém řádku, autor Hanys" },
   "engines": { "orca": ">=1.4.268" },
   "pluginApi": 1,
   "main": "src/worker.ts",
