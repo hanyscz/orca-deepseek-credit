@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stablyai/orca/main/docs/schemas/plugins/orca-plugin.v2.schema.json",
+  "manifestVersion": 2,
+  "execution": "trusted-worker",
+  "id": "deepseek-credit",
+  "name": "DeepSeek Credit",
+  "version": "0.1.0",
+  "description": "Ukazuje zbývající kredit DeepSeek ve stavovém řádku Orcy. Posílá jen dotaz na zůstatek na api.deepseek.com.",
+  "author": { "name": "Lukas Hanak" },
+  "license": "MIT",
+  "engines": { "orca": ">=1.4.268" },
+  "pluginApi": 1,
+  "main": "src/worker.ts",
+  "contributes": {
+    "commands": [
+      { "id": "deepseekCredit.refresh", "title": "DeepSeek Credit: Obnovit kredit", "when": "global" }
+    ],
+    "settings": [
+      {
+        "key": "apiKey",
+        "title": "DeepSeek API klíč",
+        "description": "Klíč z platform.deepseek.com/api_keys. Posílá se jen na api.deepseek.com.",
+        "type": "string",
+        "default": "",
+        "placeholder": "sk-..."
+      },
+      {
+        "key": "refreshMinutes",
+        "title": "Interval obnovy (minuty)",
+        "description": "Jak často se kredit znovu načítá.",
+        "type": "integer",
+        "default": 5,
+        "minimum": 1,
+        "maximum": 120
+      }
+    ],
+    "statusBarItems": [
+      {
+        "id": "credit",
+        "text": "DeepSeek",
+        "icon": "database",
+        "tone": "neutral",
+        "tooltip": "Kredit DeepSeek",
+        "command": "deepseekCredit.refresh"
+      }
+    ]
+  },
+  "capabilities": [{ "kind": "settings:own" }]
+}
