@@ -1,0 +1,48 @@
+name: Release
+
+# Při pushi do master, který změní orca-plugin.json, vytvoří tag vX.Y.Z a GitHub release,
+# pokud pro aktuální verzi ještě neexistuje. Katalog Orcy si nový tag sám načte.
+on:
+  push:
+    branches: [master]
+    paths: [orca-plugin.json]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Přečti verzi
+        id: ver
+        run: |
+          version="$(jq -r .version orca-plugin.json)"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error file=orca-plugin.json::Verze '$version' není ve tvaru X.Y.Z"
+            exit 1
+          fi
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
+      - name: Zjisti, jestli tag už existuje
+        id: exists
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/${{ steps.ver.outputs.tag }}" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Tag ${{ steps.ver.outputs.tag }} už existuje, nic se nevydává."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Vytvoř tag a release
+        if: steps.exists.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.ver.outputs.tag }}" \
+            --target "${{ github.sha }}" \
+            --title "DeepSeek Credit ${{ steps.ver.outputs.tag }}" \
+            --generate-notes

@@ -64,6 +64,12 @@ s oknem 1600×1000:
 chrome --headless=new --hide-scrollbars --window-size=1600,1000 --screenshot=assets/cover.png assets/cover.html
 ```
 
+### Vydání nové verze
+
+Stačí zvýšit `version` v `orca-plugin.json` a pushnout do `master`. Action
+[`release.yml`](.github/workflows/release.yml) vytvoří tag `vX.Y.Z` a GitHub release, pokud pro tu verzi ještě
+neexistují. Katalog Orcy si nový tag načte sám, obvykle do hodiny. Jednou vydaná verze se už nedá změnit.
+
 ## Licence
 
 [MIT](LICENSE) © 2026 Lukas Hanak
