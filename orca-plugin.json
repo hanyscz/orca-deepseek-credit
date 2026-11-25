@@ -5,35 +5,47 @@
   "id": "deepseek-credit",
   "name": "DeepSeek Credit",
   "version": "0.1.0",
-  "description": "Ukazuje zbývající kredit DeepSeek ve stavovém řádku Orcy. Posílá jen dotaz na zůstatek na api.deepseek.com.",
+  "description": "Shows your remaining DeepSeek credit in Orca's status bar. Czech and English. Only sends a balance request to api.deepseek.com.",
   "author": { "name": "Lukas Hanak" },
   "license": "MIT",
   "icon": "assets/icon.png",
-  "cover": { "path": "assets/cover.png", "alt": "DeepSeek Credit pro Orca – zbývající kredit DeepSeek ve stavovém řádku, autor Hanys" },
+  "cover": {
+    "path": "assets/cover.png",
+    "alt": "DeepSeek Credit for Orca: remaining DeepSeek credit in the status bar, by Hanys"
+  },
   "engines": { "orca": ">=1.4.268" },
   "pluginApi": 1,
   "main": "src/worker.ts",
   "contributes": {
     "commands": [
-      { "id": "deepseekCredit.refresh", "title": "DeepSeek Credit: Obnovit kredit", "when": "global" }
+      { "id": "deepseekCredit.refresh", "title": "DeepSeek Credit: Refresh credit", "when": "global" }
     ],
     "settings": [
       {
         "key": "apiKey",
-        "title": "DeepSeek API klíč",
-        "description": "Klíč z platform.deepseek.com/api_keys. Posílá se jen na api.deepseek.com.",
+        "title": "DeepSeek API key",
+        "description": "Key from platform.deepseek.com/api_keys. Sent only to api.deepseek.com.",
         "type": "string",
         "default": "",
         "placeholder": "sk-..."
       },
       {
         "key": "refreshMinutes",
-        "title": "Interval obnovy (minuty)",
-        "description": "Jak často se kredit znovu načítá.",
+        "title": "Refresh interval (minutes)",
+        "description": "How often the credit is reloaded.",
         "type": "integer",
         "default": 5,
         "minimum": 1,
         "maximum": 120
+      },
+      {
+        "key": "language",
+        "title": "Language",
+        "description": "Language of the status bar text. Auto follows your system language (Czech or Slovak gives Czech, anything else English).",
+        "type": "string",
+        "default": "auto",
+        "enum": ["auto", "en", "cs"],
+        "enumLabels": ["Auto (system)", "English", "Čeština"]
       }
     ],
     "statusBarItems": [
@@ -42,10 +54,12 @@
         "text": "DeepSeek",
         "icon": "database",
         "tone": "neutral",
-        "tooltip": "Kredit DeepSeek",
+        "tooltip": "DeepSeek credit",
         "command": "deepseekCredit.refresh"
       }
     ]
   },
-  "capabilities": [{ "kind": "settings:own" }]
+  "capabilities": [
+    { "kind": "settings:own" }
+  ]
 }

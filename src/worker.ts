@@ -6,8 +6,43 @@ const SYMBOL: Record<string, string> = { USD: '$', CNY: '¥' }
 
 type Balance = { currency?: string; total_balance?: string }
 type Payload = { is_available?: boolean; balance_infos?: Balance[] }
+type Lang = 'cs' | 'en'
 
-async function fetchCredit(key: string): Promise<string> {
+const MESSAGES = {
+  cs: {
+    noKey: 'DeepSeek: nastav klíč',
+    noKeyTip: 'Zadej API klíč v nastavení pluginu',
+    creditTip: (credit: string) => `Kredit DeepSeek: ${credit}\nKlikni pro obnovení`,
+    failedTip: (msg: string) => `Nepodařilo se načíst kredit: ${msg}`,
+    invalidKey: 'Neplatný API klíč',
+    unexpected: 'Neočekávaná odpověď',
+    timeout: 'Vypršel časový limit'
+  },
+  en: {
+    noKey: 'DeepSeek: set API key',
+    noKeyTip: 'Enter your API key in the plugin settings',
+    creditTip: (credit: string) => `DeepSeek credit: ${credit}\nClick to refresh`,
+    failedTip: (msg: string) => `Could not load credit: ${msg}`,
+    invalidKey: 'Invalid API key',
+    unexpected: 'Unexpected response',
+    timeout: 'Request timed out'
+  }
+} satisfies Record<Lang, unknown>
+
+type Messages = (typeof MESSAGES)[Lang]
+
+// Plugin workers do not get Orca's UI language, so "auto" follows the system locale.
+function systemLocale(): string {
+  const nav = (globalThis as { navigator?: { language?: string } }).navigator
+  return nav?.language || Intl.DateTimeFormat().resolvedOptions().locale || 'en'
+}
+
+function resolveLang(setting: unknown): Lang {
+  if (setting === 'cs' || setting === 'en') return setting
+  return /^(cs|sk)\b/i.test(systemLocale()) ? 'cs' : 'en'
+}
+
+async function fetchCredit(key: string, t: Messages): Promise<string> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 8000)
   try {
@@ -15,11 +50,11 @@ async function fetchCredit(key: string): Promise<string> {
       headers: { Accept: 'application/json', Authorization: `Bearer ${key}` },
       signal: controller.signal
     })
-    if (res.status === 401 || res.status === 403) throw new Error('Neplatný API klíč')
+    if (res.status === 401 || res.status === 403) throw new Error(t.invalidKey)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const data = (await res.json()) as Payload
     const infos = (data.balance_infos ?? []).filter((b) => b.currency)
-    if (infos.length === 0) throw new Error('Neočekávaná odpověď')
+    if (infos.length === 0) throw new Error(t.unexpected)
     // Prefer USD alone, like the tray app; otherwise show every currency.
     const shown = infos.some((b) => b.currency === 'USD') ? infos.filter((b) => b.currency === 'USD') : infos
     return shown
@@ -30,6 +65,9 @@ async function fetchCredit(key: string): Promise<string> {
         return SYMBOL[cur] ? `${SYMBOL[cur]}${text}` : `${text} ${cur}`
       })
       .join(' · ')
+  } catch (error) {
+    if (controller.signal.aborted) throw new Error(t.timeout)
+    throw error
   } finally {
     clearTimeout(timer)
   }
@@ -56,15 +94,16 @@ export default function activate(orca: OrcaWorkerApi): void {
   }
 
   async function refresh(): Promise<void> {
-    const settings = (await orca.settings.get()) as { apiKey?: unknown }
+    const settings = (await orca.settings.get()) as { apiKey?: unknown; language?: unknown }
+    const t = MESSAGES[resolveLang(settings.language)]
     const key = typeof settings.apiKey === 'string' ? settings.apiKey.trim() : ''
-    if (!key) return show('DeepSeek: nastav klíč', 'Zadej API klíč v nastavení pluginu', true)
+    if (!key) return show(t.noKey, t.noKeyTip, true)
     try {
-      const credit = await fetchCredit(key)
-      await show(`DeepSeek ${credit}`, `Kredit DeepSeek: ${credit}\nKlikni pro obnovení`, false)
+      const credit = await fetchCredit(key, t)
+      await show(`DeepSeek ${credit}`, t.creditTip(credit), false)
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error)
-      await show('DeepSeek !', `Nepodařilo se načíst kredit: ${msg}`, true)
+      await show('DeepSeek !', t.failedTip(msg), true)
     }
   }
 
