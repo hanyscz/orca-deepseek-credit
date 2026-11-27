@@ -42,6 +42,13 @@ function resolveLang(setting: unknown): Lang {
   return /^(cs|sk)\b/i.test(systemLocale()) ? 'cs' : 'en'
 }
 
+export function balancesToShow(infos: Balance[]): Balance[] {
+  const funded = infos.filter((b) => Number(b.total_balance) > 0)
+  const usd = funded.find((b) => b.currency === 'USD')
+  if (usd) return [usd]
+  return funded.length ? funded : infos
+}
+
 async function fetchCredit(key: string, t: Messages): Promise<string> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 8000)
@@ -55,9 +62,7 @@ async function fetchCredit(key: string, t: Messages): Promise<string> {
     const data = (await res.json()) as Payload
     const infos = (data.balance_infos ?? []).filter((b) => b.currency)
     if (infos.length === 0) throw new Error(t.unexpected)
-    // Prefer USD alone, like the tray app; otherwise show every currency.
-    const shown = infos.some((b) => b.currency === 'USD') ? infos.filter((b) => b.currency === 'USD') : infos
-    return shown
+    return balancesToShow(infos)
       .map((b) => {
         const cur = String(b.currency).toUpperCase()
         const amount = Number(b.total_balance)

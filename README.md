@@ -9,8 +9,8 @@ přímo ve stavovém řádku, například `DeepSeek $12.48`. Kliknutím na polo�
 
 ## Co plugin ukazuje
 
-- **Stavový řádek:** aktuální zůstatek účtu DeepSeek. Pokud účet vede zůstatek v USD, ukáže se jen USD. Jinak se
-  ukážou všechny měny (`¥` pro CNY, ostatní s kódem měny).
+- **Stavový řádek:** aktuální zůstatek účtu DeepSeek. Při kladném zůstatku v USD se zobrazí jen USD. Jinak se zobrazí měny
+  s kladným zůstatkem. Pokud žádná taková není, zobrazí se všechny měny (`¥` pro CNY, ostatní s kódem měny).
 - **Tooltip:** celý zůstatek a nápověda, že kliknutím kredit obnovíš.
 - **Varování:** bez klíče, s neplatným klíčem nebo při chybě sítě se položka přepne na varovnou ikonu a barvu
   a tooltip řekne, co se stalo (`Neplatný API klíč`, `HTTP 500` a podobně).
@@ -81,8 +81,8 @@ neexistují. Katalog Orcy si nový tag načte sám, obvykle do hodiny. Jednou vy
 A small [Orca](https://github.com/stablyai/orca) plugin that shows your **remaining DeepSeek credit** in the status
 bar, for example `DeepSeek $12.48`. Click the item to refresh it right away.
 
-- **Status bar:** the current DeepSeek account balance. If the account has a USD balance, only USD is shown. Otherwise
-  every currency is shown (`¥` for CNY, others with their currency code).
+- **Status bar:** the current DeepSeek account balance. A positive USD balance is shown on its own. Otherwise the bar shows currencies
+  with a positive balance, or all currencies if none are positive (`¥` for CNY, others with their currency code).
 - **Warnings:** with no key, an invalid key or a network error, the item switches to a warning icon and colour and the
   tooltip says what went wrong.
 - It is the balance of the whole DeepSeek account, whichever agent or app spent it.
